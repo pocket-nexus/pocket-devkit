@@ -16,7 +16,7 @@ pub enum Action {
 }
 
 impl Menu {
-    /// Consume the entire chord through release, before launcher SELECT handling.
+    /// Consume the entire chord through release, before the guest sees SELECT.
     pub fn input(&mut self, buttons: u32) -> (u32, Action) {
         let edge = buttons & !self.previous;
         if buttons & CHORD == CHORD && self.previous & CHORD != CHORD {
@@ -53,7 +53,7 @@ impl Menu {
 mod tests {
     use super::*;
     #[test]
-    fn chord_never_leaks_select_to_the_launcher_and_rearms_after_release() {
+    fn chord_never_leaks_select_to_the_guest_and_rearms_after_release() {
         let mut menu = Menu::default();
         assert_eq!(menu.input(1), (1, Action::None));
         assert_eq!(menu.input(CHORD), (0, Action::None));

@@ -11,7 +11,7 @@ publish = false
 [workspace]
 
 [dependencies]
-# The program building blocks: runtime, scene, input, app switching, overlays.
+# The program building blocks: runtime, scene, input, the embedded bundle, overlays.
 # `guest-deadline` interrupts a guest loop so the developer menu stays usable.
 pocketjs-vita = { path = "../../vendor/pocketjs/programs/vita", features = ["guest-deadline"] }
 pocketjs-core = { path = "../../vendor/pocketjs/engine/core" }
