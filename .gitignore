@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.pocket/
+# Build scratch, the USB share, the USBHostFS cache and validation output.
+.pocket-build/
+# Cargo output of the Vita program and the protocol test crate.
+target/
+.DS_Store

@@ -1,0 +1,18 @@
+{
+  "name": "pocket-devkit",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "description": "Wired development systems for PocketJS programs on devices: PS Vita",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pocket-nexus/pocket-devkit.git"
+  },
+  "scripts": {
+    "setup": "git submodule update --init && bun install --cwd vendor/pocketjs --frozen-lockfile && bun scripts/setup.ts",
+    "vita": "bun vita/tools/vita-dev.ts",
+    "check": "bun node_modules/typescript/bin/tsc --noEmit && bun run test",
+    "test": "bun test ./vita/test"
+  }
+}

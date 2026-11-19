@@ -1,0 +1,69 @@
+name: CI
+
+# Two jobs: the host tests (type check, the USB client, the device protocol
+# compiled for the computer, the program lockfile) and the Pocket Devkit VPK,
+# built with the SDK vita/tools/sdk.ts pins on the macOS arm64 host it supports.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  host:
+    name: Type check and host tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: true
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: .bun-version
+      - name: Install the stable compiler vendor/pocketjs pins
+        run: |
+          stable=$(bun -e 'console.log((await import("./vendor/pocketjs/tools/build/toolchains/rust.ts")).STABLE_RUST_TOOLCHAIN)')
+          rustup toolchain install "$stable" --profile minimal
+      - run: bun run setup
+      - run: bun run check
+
+  vita:
+    name: Pocket Devkit VPK
+    runs-on: macos-15
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: true
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: .bun-version
+      - name: Install the compilers vendor/pocketjs pins
+        run: |
+          stable=$(bun -e 'console.log((await import("./vendor/pocketjs/tools/build/toolchains/rust.ts")).STABLE_RUST_TOOLCHAIN)')
+          nightly=$(bun -e 'console.log((await import("./vendor/pocketjs/tools/build/toolchains/rust.ts")).BUILD_STD_NIGHTLY)')
+          rustup toolchain install "$stable" --profile minimal
+          rustup toolchain install "$nightly" --profile minimal --component rust-src
+      - run: bun run setup
+      - name: Install the pinned VitaSDK with taiHEN stubs
+        run: |
+          sdk=$(bun vita/tools/sdk.ts "$RUNNER_TEMP/pocket-vita" | tail -n 1)
+          echo "VITASDK=$sdk" >> "$GITHUB_ENV"
+          echo "$sdk/bin" >> "$GITHUB_PATH"
+      - run: bun run vita build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pocket-devkit-vita
+          path: |
+            dist/vita/devkit-main.vpk
+            dist/vita/devkit-main.runtime.json
+          if-no-files-found: error

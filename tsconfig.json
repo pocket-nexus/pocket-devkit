@@ -1,0 +1,21 @@
+{
+  // Type checking only (`bun run check`); PocketJS's compiler owns the JSX
+  // transform, so jsx stays "preserve" as in vendor/pocketjs/tsconfig.json.
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ESNext"],
+    "types": ["bun"],
+    "jsx": "preserve",
+    "strict": true,
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  // jsx.d.ts declares the JSX namespace PocketJS application code types against.
+  "files": ["vendor/pocketjs/framework/src/jsx.d.ts"],
+  "include": ["scripts", "vita/app", "vita/tools", "vita/test"]
+}

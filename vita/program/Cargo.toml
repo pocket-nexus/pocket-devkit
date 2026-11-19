@@ -1,0 +1,40 @@
+[package]
+name = "pocket-devkit-vita"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/pocket-nexus/pocket-devkit"
+description = "The PS Vita program of Pocket Devkit: the pocketjs-vita frame loop with the USB developer host"
+publish = false
+
+# A standalone graph: Cargo does not search the directories above for a workspace.
+[workspace]
+
+[dependencies]
+# The program building blocks: runtime, scene, input, app switching, overlays.
+# `guest-deadline` interrupts a guest loop so the developer menu stays usable.
+pocketjs-vita = { path = "../../vendor/pocketjs/programs/vita", features = ["guest-deadline"] }
+pocketjs-core = { path = "../../vendor/pocketjs/engine/core" }
+pocket-package = { path = "../../vendor/pocketjs/engine/package" }
+# Process time, module paths, free memory and battery for the USB host (src/dev.rs).
+vitasdk-sys = { version = "0.3.3", features = ["SceKernelModulemgr_stub", "SceLibKernel_stub", "ScePower_stub", "SceSysmem_stub"] }
+vita2d-sys = "0.1.1"
+# The USB mailbox protocol (src/dev.rs, src/dev_protocol.rs).
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[features]
+# The generic runtime: no embedded app; the program reads app0:app.pkb at startup.
+runtime = ["pocketjs-vita/runtime"]
+
+# The settings PocketJS applies to its own Vita program: the workspace profiles
+# that reach this graph, and the link-time optimization its build tool sets for
+# release builds (CARGO_PROFILE_RELEASE_LTO).
+[profile.dev]
+opt-level = 1
+
+[profile.dev.package."*"]
+opt-level = 3
+
+[profile.release]
+lto = true
