@@ -129,7 +129,7 @@ Linux; Windows driver and host setup is not supplied. `serve` holds the
 ## Developer menu
 
 **L + R + SELECT opens the native menu.** The host consumes the chord until
-release before processing launcher SELECT. While the menu is open, guest
+release, so the guest does not see its SELECT. While the menu is open, guest
 input is cleared and guest rendering continues.
 
 | Input | Action |
@@ -194,13 +194,12 @@ output, and native plan. The render thread retires the previous QuickJS realm,
 GPU resources, core, and PAK at a closed-scene boundary. It then creates the
 new guest. Failure during evaluation or the first frame restores the previous
 bundle in a fresh realm and returns an error. JavaScript state resets; this is
-whole-guest reload. The updated bundle remains in memory until reset,
-application switching, or process exit.
+whole-guest reload. The updated bundle remains in memory until reset or
+process exit.
 
 The package limit is **32 MiB**. Source paths, title, version, and plan hash
 may change without changing native services. Other plan changes require a
-native rebuild. Updates in a multi-app VPK address its main guest; return to
-that guest before pushing.
+native rebuild.
 
 ## Native replacement
 
